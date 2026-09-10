@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -207,16 +208,19 @@
     import {
         getDatabase,
         ref,
-        get,
-        child
+        get
     } from
     "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 
-    // Firebase configuration
+    // ==============================
+    // FIREBASE CONFIGURATION
+    // ==============================
+
     const firebaseConfig = {
 
-        apiKey: "YOUR_API_KEY",
+        apiKey:
+            "AIzaSyBoTtizM_SfChAAhvjmZloB-j5wCKLH4Ps",
 
         authDomain:
             "gbps-karam-khan-nizamani.firebaseapp.com",
@@ -230,10 +234,14 @@
         storageBucket:
             "gbps-karam-khan-nizamani.firebasestorage.app",
 
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        messagingSenderId:
+            "772460890400",
 
-        appId: "YOUR_APP_ID"
+        appId:
+            "1:772460890400:web:cf2379f4e0d21ebe476f45",
 
+        measurementId:
+            "G-KDQ1MQ16WN"
     };
 
 
@@ -243,11 +251,16 @@
     const database = getDatabase(app);
 
 
-    // Make function available to HTML button
+    // ==============================
+    // STUDENT SEARCH
+    // ==============================
+
     window.searchStudent = async function () {
 
         const grNo =
-            document.getElementById("grNo").value.trim();
+            document.getElementById("grNo")
+                .value
+                .trim();
 
         const message =
             document.getElementById("message");
@@ -256,10 +269,15 @@
             document.getElementById("studentResult");
 
 
-        // Clear previous result
+        // Hide old result
         result.style.display = "none";
 
 
+        // Clear message
+        message.textContent = "";
+
+
+        // Check empty GR number
         if (grNo === "") {
 
             message.textContent =
@@ -280,24 +298,15 @@
 
         try {
 
-            const dbRef = ref(database);
-
-            /*
-             * Students are expected to be stored under:
-             *
-             * students
-             *
-             * and each student should have a GR No.
-             */
-
+            // Read Firebase database root
             const snapshot =
-                await get(child(dbRef, "students"));
+                await get(ref(database));
 
 
             if (!snapshot.exists()) {
 
                 message.textContent =
-                    "No student data found.";
+                    "No data found in Firebase.";
 
                 message.style.color =
                     "red";
@@ -306,46 +315,52 @@
             }
 
 
-            const students =
+            const data =
                 snapshot.val();
 
 
             let foundStudent = null;
 
 
-            // Search through students
-            Object.keys(students).forEach(key => {
+            // ==============================
+            // SEARCH ALL ROOT RECORDS
+            // ==============================
 
-                const student =
-                    students[key];
+            Object.keys(data).forEach(key => {
+
+                const record =
+                    data[key];
 
 
-                if (!student) {
+                // Ignore non-student nodes
+                if (
+                    !record ||
+                    typeof record !== "object" ||
+                    Array.isArray(record)
+                ) {
                     return;
                 }
 
 
-                const studentGR =
-                    String(
-                        student.grNo ??
-                        student.gr ??
-                        student.GRNo ??
-                        ""
-                    ).trim();
-
-
+                // Check actual field used
                 if (
-                    studentGR.toLowerCase() ===
+                    record.grNumber !== undefined &&
+                    String(record.grNumber)
+                        .trim()
+                        .toLowerCase() ===
                     grNo.toLowerCase()
                 ) {
 
-                    foundStudent =
-                        student;
+                    foundStudent = record;
 
                 }
 
             });
 
+
+            // ==============================
+            // STUDENT NOT FOUND
+            // ==============================
 
             if (!foundStudent) {
 
@@ -359,53 +374,43 @@
             }
 
 
-            // Display student information
+            // ==============================
+            // DISPLAY STUDENT
+            // ==============================
 
             document.getElementById("studentGR")
                 .textContent =
-                foundStudent.grNo ??
-                foundStudent.gr ??
-                foundStudent.GRNo ??
-                grNo;
+                foundStudent.grNumber || "—";
 
 
             document.getElementById("studentName")
                 .textContent =
-                foundStudent.name ??
-                foundStudent.studentName ??
-                foundStudent.student_name ??
-                "—";
+                foundStudent.name || "—";
 
 
             document.getElementById("fatherName")
                 .textContent =
-                foundStudent.fatherName ??
-                foundStudent.father ??
-                foundStudent.father_name ??
-                "—";
+                foundStudent.father || "—";
 
 
             document.getElementById("studentClass")
                 .textContent =
-                foundStudent.class ??
-                foundStudent.className ??
-                foundStudent.grade ??
-                "—";
+                foundStudent.className || "—";
 
 
             document.getElementById("rollNumber")
                 .textContent =
-                foundStudent.rollNumber ??
-                foundStudent.rollNo ??
-                foundStudent.roll ??
-                "—";
+                foundStudent.roll || "—";
 
 
             document.getElementById("dateOfBirth")
                 .textContent =
-                foundStudent.dateOfBirth ??
-                foundStudent.dob ??
-                "—";
+                foundStudent.dateOfBirth || "—";
+
+
+            // Show result
+            result.style.display =
+                "block";
 
 
             message.textContent =
@@ -414,15 +419,16 @@
             message.style.color =
                 "#0b5d3b";
 
-
-            result.style.display =
-                "block";
-
         }
+
 
         catch (error) {
 
-            console.error(error);
+            console.error(
+                "Firebase Error:",
+                error
+            );
+
 
             message.textContent =
                 "Unable to connect to Firebase.";
@@ -435,17 +441,23 @@
     };
 
 
-    // Allow pressing Enter to search
+    // ==============================
+    // ENTER KEY SEARCH
+    // ==============================
+
     document.getElementById("grNo")
-        .addEventListener("keypress", function(event) {
+        .addEventListener(
+            "keypress",
+            function(event) {
 
-            if (event.key === "Enter") {
+                if (event.key === "Enter") {
 
-                window.searchStudent();
+                    window.searchStudent();
+
+                }
 
             }
-
-        });
+        );
 
 </script>
 
