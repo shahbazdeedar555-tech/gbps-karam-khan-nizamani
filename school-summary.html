@@ -5,10 +5,7 @@
 
 <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Final Daily Attendance Report | GBPS Karam Khan Nizamani</title>
 
@@ -134,31 +131,44 @@ input[type="date"]{
     color:#f9a825;
 }
 
-/* ================= SHARE BUTTON ================= */
 
-.share-btn{
-    display:block;
-    width:100%;
-    max-width:400px;
-    margin:0 auto 20px;
-    padding:14px 20px;
-    border:none;
-    border-radius:10px;
-    background:#006a4e;
-    color:white;
-    font-size:17px;
-    font-weight:bold;
-    cursor:pointer;
-    box-shadow:0 3px 8px rgba(0,0,0,0.12);
+/* ================= BUTTONS ================= */
+
+.report-buttons{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-bottom:20px;
 }
 
-.share-btn:active{
+.report-btn{
+    border:none;
+    border-radius:9px;
+    padding:14px 22px;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    min-width:180px;
+}
+
+.share-btn{
+    background:#1565c0;
+}
+
+.copy-btn{
+    background:#6a1b9a;
+}
+
+.report-btn:hover{
+    opacity:0.9;
+}
+
+.report-btn:active{
     transform:scale(0.98);
 }
 
-.share-btn:hover{
-    opacity:0.92;
-}
 
 /* ================= TABLE ================= */
 
@@ -250,6 +260,15 @@ footer{
 
     .summary-box strong{
         font-size:25px;
+    }
+
+    .report-buttons{
+        display:grid;
+        grid-template-columns:1fr;
+    }
+
+    .report-btn{
+        width:100%;
     }
 
 }
@@ -365,16 +384,26 @@ footer{
 </div>
 
 
-<!-- ================= SHARE BUTTON ================= -->
+<!-- ================= SHARE / COPY BUTTONS ================= -->
 
-<button
-    id="shareReportBtn"
-    class="share-btn"
->
+<div class="report-buttons">
 
-    📤 Share Daily Report
+    <button
+        id="shareReportBtn"
+        class="report-btn share-btn"
+    >
+        📤 Share Daily Report
+    </button>
 
-</button>
+
+    <button
+        id="copyReportBtn"
+        class="report-btn copy-btn"
+    >
+        📋 Copy Daily Report
+    </button>
+
+</div>
 
 
 <div class="table-box">
@@ -620,10 +649,14 @@ const connectionStatus =
         "connectionStatus"
     );
 
-
 const shareReportBtn =
     document.getElementById(
         "shareReportBtn"
+    );
+
+const copyReportBtn =
+    document.getElementById(
+        "copyReportBtn"
     );
 
 
@@ -1397,26 +1430,6 @@ async function loadSchoolSummary(){
 
         `;
 
-
-        document.getElementById(
-            "schoolTotal"
-        ).textContent = "0";
-
-
-        document.getElementById(
-            "schoolPresent"
-        ).textContent = "0";
-
-
-        document.getElementById(
-            "schoolAbsent"
-        ).textContent = "0";
-
-
-        document.getElementById(
-            "schoolLeave"
-        ).textContent = "0";
-
     }
 
 }
@@ -1545,101 +1558,80 @@ function displayResults(
 }
 
 
-/* ================= DATE CHANGE ================= */
+/* ================= CREATE REPORT TEXT ================= */
 
-dateInput.addEventListener(
-    "change",
-    function(){
+function createReportText(){
 
-        localStorage.setItem(
-            "schoolAttendanceDate",
-            this.value
+    const date =
+        dateInput.value;
+
+
+    const total =
+        document.getElementById(
+            "schoolTotal"
+        ).textContent;
+
+
+    const present =
+        document.getElementById(
+            "schoolPresent"
+        ).textContent;
+
+
+    const absent =
+        document.getElementById(
+            "schoolAbsent"
+        ).textContent;
+
+
+    const leave =
+        document.getElementById(
+            "schoolLeave"
+        ).textContent;
+
+
+    const rows =
+        document.querySelectorAll(
+            "#summaryTable tr"
         );
 
-        loadSchoolSummary();
 
-    }
-);
+    let classReport = "";
 
 
-/* ================= SHARE REPORT ================= */
+    rows.forEach(
+        row => {
 
-shareReportBtn.addEventListener(
-    "click",
-    async function(){
-
-        const date =
-            dateInput.value;
-
-
-        const total =
-            document.getElementById(
-                "schoolTotal"
-            ).textContent;
+            const cells =
+                row.querySelectorAll(
+                    "td"
+                );
 
 
-        const present =
-            document.getElementById(
-                "schoolPresent"
-            ).textContent;
+            if(
+                cells.length === 5
+            ){
 
+                classReport +=
 
-        const absent =
-            document.getElementById(
-                "schoolAbsent"
-            ).textContent;
+                    `${cells[0].textContent.trim()}\n` +
 
+                    `Total: ${cells[1].textContent.trim()} | ` +
 
-        const leave =
-            document.getElementById(
-                "schoolLeave"
-            ).textContent;
+                    `Present: ${cells[2].textContent.trim()} | ` +
 
+                    `Absent: ${cells[3].textContent.trim()} | ` +
 
-        const rows =
-            document.querySelectorAll(
-                "#summaryTable tr"
-            );
-
-
-        let classReport = "";
-
-
-        rows.forEach(
-            row => {
-
-                const cells =
-                    row.querySelectorAll(
-                        "td"
-                    );
-
-
-                if(
-                    cells.length === 5
-                ){
-
-                    classReport +=
-
-                        `${cells[0].textContent.trim()}\n` +
-
-                        `Total: ${cells[1].textContent.trim()} | ` +
-
-                        `Present: ${cells[2].textContent.trim()} | ` +
-
-                        `Absent: ${cells[3].textContent.trim()} | ` +
-
-                        `Leave: ${cells[4].textContent.trim()}\n\n`;
-
-                }
+                    `Leave: ${cells[4].textContent.trim()}\n\n`;
 
             }
-        );
+
+        }
+    );
 
 
-        const reportText =
-
-`🏫 Government Boys Primary School
-Karam Khan Nizamani Campus
+    return `🏫 GOVERNMENT BOYS PRIMARY SCHOOL
+KARAM KHAN NIZAMANI CAMPUS
 
 📊 FINAL DAILY ATTENDANCE REPORT
 
@@ -1657,7 +1649,20 @@ Total Students: ${total}
 ${classReport}
 Government Boys Primary School
 Karam Khan Nizamani Campus
+
 © 2026`;
+
+}
+
+
+/* ================= SHARE ================= */
+
+shareReportBtn.addEventListener(
+    "click",
+    async function(){
+
+        const reportText =
+            createReportText();
 
 
         if(
@@ -1679,35 +1684,77 @@ Karam Khan Nizamani Campus
             }
             catch(error){
 
-                console.log(
-                    "Share cancelled."
-                );
+                if(
+                    error.name !== "AbortError"
+                ){
+
+                    copyReport();
+
+                }
 
             }
 
         }
         else{
 
-            try{
-
-                await navigator.clipboard.writeText(
-                    reportText
-                );
-
-                alert(
-                    "Report copied. You can paste it into WhatsApp."
-                );
-
-            }
-            catch(error){
-
-                alert(
-                    "Sharing is not supported on this browser."
-                );
-
-            }
+            copyReport();
 
         }
+
+    }
+);
+
+
+/* ================= COPY ================= */
+
+async function copyReport(){
+
+    const reportText =
+        createReportText();
+
+
+    try{
+
+        await navigator.clipboard.writeText(
+            reportText
+        );
+
+
+        alert(
+            "✅ Report copied successfully.\n\nYou can now paste it into WhatsApp."
+        );
+
+    }
+    catch(error){
+
+        window.prompt(
+            "Copy the report below:",
+            reportText
+        );
+
+    }
+
+}
+
+
+copyReportBtn.addEventListener(
+    "click",
+    copyReport
+);
+
+
+/* ================= DATE CHANGE ================= */
+
+dateInput.addEventListener(
+    "change",
+    function(){
+
+        localStorage.setItem(
+            "schoolAttendanceDate",
+            this.value
+        );
+
+        loadSchoolSummary();
 
     }
 );
