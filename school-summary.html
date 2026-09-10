@@ -26,8 +26,6 @@ body{
     color:#222;
 }
 
-/* ================= HEADER ================= */
-
 header{
     background:#006a4e;
     color:white;
@@ -44,15 +42,11 @@ header p{
     font-size:14px;
 }
 
-/* ================= CONTAINER ================= */
-
 .container{
     max-width:1100px;
     margin:20px auto;
     padding:15px;
 }
-
-/* ================= TOP BOX ================= */
 
 .top-box,
 .table-box{
@@ -76,8 +70,6 @@ h2{
     margin-bottom:8px;
 }
 
-/* ================= DATE ================= */
-
 .date-box{
     margin-top:18px;
 }
@@ -96,8 +88,6 @@ input[type="date"]{
     font-size:15px;
 }
 
-/* ================= STATUS ================= */
-
 .status{
     padding:11px;
     margin-bottom:18px;
@@ -106,8 +96,6 @@ input[type="date"]{
     color:#006a4e;
     font-weight:bold;
 }
-
-/* ================= SCHOOL TOTALS ================= */
 
 .school-summary{
     display:grid;
@@ -144,6 +132,32 @@ input[type="date"]{
 
 .summary-box.leave strong{
     color:#f9a825;
+}
+
+/* ================= SHARE BUTTON ================= */
+
+.share-btn{
+    display:block;
+    width:100%;
+    max-width:400px;
+    margin:0 auto 20px;
+    padding:14px 20px;
+    border:none;
+    border-radius:10px;
+    background:#006a4e;
+    color:white;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 3px 8px rgba(0,0,0,0.12);
+}
+
+.share-btn:active{
+    transform:scale(0.98);
+}
+
+.share-btn:hover{
+    opacity:0.92;
 }
 
 /* ================= TABLE ================= */
@@ -194,23 +208,17 @@ tr:last-child td{
     font-weight:bold;
 }
 
-/* ================= GRAND TOTAL ================= */
-
 .grand-total{
     background:#e8f5e9;
     font-weight:bold;
     font-size:16px;
 }
 
-/* ================= LOADING ================= */
-
 .loading{
     padding:20px;
     text-align:center;
     color:#777;
 }
-
-/* ================= FOOTER ================= */
 
 footer{
     margin-top:30px;
@@ -220,8 +228,6 @@ footer{
     padding:20px;
     font-size:13px;
 }
-
-/* ================= MOBILE ================= */
 
 @media(max-width:650px){
 
@@ -254,8 +260,6 @@ footer{
 
 <body>
 
-<!-- ================= HEADER ================= -->
-
 <header>
 
     <h1>
@@ -271,8 +275,6 @@ footer{
 
 <div class="container">
 
-
-<!-- ================= TOP ================= -->
 
 <div class="top-box">
 
@@ -291,7 +293,6 @@ footer{
         Complete attendance report for KG and Classes 1–5.
     </p>
 
-
     <div class="date-box">
 
         <label for="attendanceDate">
@@ -308,8 +309,6 @@ footer{
 </div>
 
 
-<!-- ================= CONNECTION ================= -->
-
 <div
     id="connectionStatus"
     class="status"
@@ -317,8 +316,6 @@ footer{
     🟡 Loading student and attendance data...
 </div>
 
-
-<!-- ================= SCHOOL TOTALS ================= -->
 
 <div class="school-summary">
 
@@ -368,7 +365,17 @@ footer{
 </div>
 
 
-<!-- ================= FINAL TABLE ================= -->
+<!-- ================= SHARE BUTTON ================= -->
+
+<button
+    id="shareReportBtn"
+    class="share-btn"
+>
+
+    📤 Share Daily Report
+
+</button>
+
 
 <div class="table-box">
 
@@ -383,25 +390,15 @@ footer{
 
             <tr>
 
-                <th>
-                    Class
-                </th>
+                <th>Class</th>
 
-                <th>
-                    Total
-                </th>
+                <th>Total</th>
 
-                <th>
-                    Present
-                </th>
+                <th>Present</th>
 
-                <th>
-                    Absent
-                </th>
+                <th>Absent</th>
 
-                <th>
-                    Leave
-                </th>
+                <th>Leave</th>
 
             </tr>
 
@@ -416,7 +413,9 @@ footer{
                     colspan="5"
                     class="loading"
                 >
+
                     🟡 Loading...
+
                 </td>
 
             </tr>
@@ -430,8 +429,6 @@ footer{
 
 </div>
 
-
-<!-- ================= FOOTER ================= -->
 
 <footer>
 
@@ -452,10 +449,6 @@ footer{
 
 <script type="module">
 
-/* =====================================================
-   FIREBASE IMPORTS
-===================================================== */
-
 import {
     initializeApp
 }
@@ -469,10 +462,6 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
 
-
-/* =====================================================
-   FIREBASE CONFIGURATION
-===================================================== */
 
 const firebaseConfig = {
 
@@ -503,20 +492,12 @@ const firebaseConfig = {
 };
 
 
-/* =====================================================
-   INITIALIZE FIREBASE
-===================================================== */
-
 const app =
     initializeApp(firebaseConfig);
 
 const db =
     getDatabase(app);
 
-
-/* =====================================================
-   CLASSES
-===================================================== */
 
 const classes = [
 
@@ -536,7 +517,6 @@ const classes = [
         ]
     },
 
-
     {
         name:"1️⃣ Class 1",
 
@@ -553,7 +533,6 @@ const classes = [
             "CLASS 1"
         ]
     },
-
 
     {
         name:"2️⃣ Class 2",
@@ -572,7 +551,6 @@ const classes = [
         ]
     },
 
-
     {
         name:"3️⃣ Class 3",
 
@@ -590,7 +568,6 @@ const classes = [
         ]
     },
 
-
     {
         name:"4️⃣ Class 4",
 
@@ -607,7 +584,6 @@ const classes = [
             "CLASS 4"
         ]
     },
-
 
     {
         name:"5️⃣ Class 5",
@@ -629,10 +605,6 @@ const classes = [
 ];
 
 
-/* =====================================================
-   ELEMENTS
-===================================================== */
-
 const dateInput =
     document.getElementById(
         "attendanceDate"
@@ -649,9 +621,11 @@ const connectionStatus =
     );
 
 
-/* =====================================================
-   TODAY
-===================================================== */
+const shareReportBtn =
+    document.getElementById(
+        "shareReportBtn"
+    );
+
 
 function getToday(){
 
@@ -676,19 +650,11 @@ function getToday(){
 }
 
 
-/* =====================================================
-   DATE
-===================================================== */
-
 dateInput.value =
     localStorage.getItem(
         "schoolAttendanceDate"
     ) || getToday();
 
-
-/* =====================================================
-   NORMALIZE
-===================================================== */
 
 function normalize(value){
 
@@ -701,10 +667,6 @@ function normalize(value){
 
 }
 
-
-/* =====================================================
-   STUDENT CLASS
-===================================================== */
 
 function getStudentClass(student){
 
@@ -742,10 +704,6 @@ function getStudentClass(student){
 }
 
 
-/* =====================================================
-   STUDENT BELONGS TO CLASS
-===================================================== */
-
 function studentBelongsToClass(
     student,
     classInfo
@@ -770,10 +728,6 @@ function studentBelongsToClass(
 
 }
 
-
-/* =====================================================
-   STUDENT IDENTIFIERS
-===================================================== */
 
 function getStudentIdentifiers(
     firebaseKey,
@@ -846,10 +800,6 @@ function getStudentIdentifiers(
 }
 
 
-/* =====================================================
-   STATUS
-===================================================== */
-
 function normalizeStatus(value){
 
     const status =
@@ -896,10 +846,6 @@ function normalizeStatus(value){
 }
 
 
-/* =====================================================
-   FIND STUDENT STATUS
-===================================================== */
-
 function findStudentStatus(
     firebaseKey,
     student,
@@ -919,8 +865,6 @@ function findStudentStatus(
             student
         );
 
-
-    /* Direct lookup */
 
     for(
         const identifier
@@ -952,8 +896,6 @@ function findStudentStatus(
 
     }
 
-
-    /* Case-insensitive lookup */
 
     const attendanceKeys =
         Object.keys(
@@ -1001,8 +943,6 @@ function findStudentStatus(
     }
 
 
-    /* Object records */
-
     for(
         const identifier
         of identifiers
@@ -1042,8 +982,6 @@ function findStudentStatus(
 
     }
 
-
-    /* Search records */
 
     for(
         const [
@@ -1132,10 +1070,6 @@ function findStudentStatus(
 }
 
 
-/* =====================================================
-   LOAD ATTENDANCE
-===================================================== */
-
 async function loadAttendance(
     classInfo,
     date
@@ -1199,10 +1133,6 @@ async function loadAttendance(
 }
 
 
-/* =====================================================
-   LOAD FINAL DAILY REPORT
-===================================================== */
-
 async function loadSchoolSummary(){
 
     const date =
@@ -1224,7 +1154,9 @@ async function loadSchoolSummary(){
                 colspan="5"
                 class="loading"
             >
+
                 🟡 Loading attendance...
+
             </td>
 
         </tr>
@@ -1237,8 +1169,6 @@ async function loadSchoolSummary(){
 
 
     try{
-
-        /* LOAD STUDENTS */
 
         const studentsSnapshot =
             await get(
@@ -1281,8 +1211,6 @@ async function loadSchoolSummary(){
 
         const results = [];
 
-
-        /* PROCESS CLASSES */
 
         for(
             const classInfo
@@ -1376,8 +1304,6 @@ async function loadSchoolSummary(){
             results
         );
 
-
-        /* SCHOOL TOTALS */
 
         const schoolTotal =
             results.reduce(
@@ -1496,10 +1422,6 @@ async function loadSchoolSummary(){
 }
 
 
-/* =====================================================
-   DISPLAY RESULTS
-===================================================== */
-
 function displayResults(
     results
 ){
@@ -1548,8 +1470,6 @@ function displayResults(
         }
     );
 
-
-    /* ALL CLASSES */
 
     const total =
         results.reduce(
@@ -1625,9 +1545,7 @@ function displayResults(
 }
 
 
-/* =====================================================
-   DATE CHANGE
-===================================================== */
+/* ================= DATE CHANGE ================= */
 
 dateInput.addEventListener(
     "change",
@@ -1644,13 +1562,163 @@ dateInput.addEventListener(
 );
 
 
-/* =====================================================
-   START
-===================================================== */
+/* ================= SHARE REPORT ================= */
+
+shareReportBtn.addEventListener(
+    "click",
+    async function(){
+
+        const date =
+            dateInput.value;
+
+
+        const total =
+            document.getElementById(
+                "schoolTotal"
+            ).textContent;
+
+
+        const present =
+            document.getElementById(
+                "schoolPresent"
+            ).textContent;
+
+
+        const absent =
+            document.getElementById(
+                "schoolAbsent"
+            ).textContent;
+
+
+        const leave =
+            document.getElementById(
+                "schoolLeave"
+            ).textContent;
+
+
+        const rows =
+            document.querySelectorAll(
+                "#summaryTable tr"
+            );
+
+
+        let classReport = "";
+
+
+        rows.forEach(
+            row => {
+
+                const cells =
+                    row.querySelectorAll(
+                        "td"
+                    );
+
+
+                if(
+                    cells.length === 5
+                ){
+
+                    classReport +=
+
+                        `${cells[0].textContent.trim()}\n` +
+
+                        `Total: ${cells[1].textContent.trim()} | ` +
+
+                        `Present: ${cells[2].textContent.trim()} | ` +
+
+                        `Absent: ${cells[3].textContent.trim()} | ` +
+
+                        `Leave: ${cells[4].textContent.trim()}\n\n`;
+
+                }
+
+            }
+        );
+
+
+        const reportText =
+
+`🏫 Government Boys Primary School
+Karam Khan Nizamani Campus
+
+📊 FINAL DAILY ATTENDANCE REPORT
+
+📅 Attendance Date: ${date}
+
+👥 SCHOOL TOTALS
+
+Total Students: ${total}
+🟢 Present: ${present}
+🔴 Absent: ${absent}
+🟡 Leave: ${leave}
+
+📚 CLASS-WISE ATTENDANCE
+
+${classReport}
+Government Boys Primary School
+Karam Khan Nizamani Campus
+© 2026`;
+
+
+        if(
+            navigator.share
+        ){
+
+            try{
+
+                await navigator.share({
+
+                    title:
+                        "Final Daily Attendance Report",
+
+                    text:
+                        reportText
+
+                });
+
+            }
+            catch(error){
+
+                console.log(
+                    "Share cancelled."
+                );
+
+            }
+
+        }
+        else{
+
+            try{
+
+                await navigator.clipboard.writeText(
+                    reportText
+                );
+
+                alert(
+                    "Report copied. You can paste it into WhatsApp."
+                );
+
+            }
+            catch(error){
+
+                alert(
+                    "Sharing is not supported on this browser."
+                );
+
+            }
+
+        }
+
+    }
+);
+
+
+/* ================= START ================= */
 
 loadSchoolSummary();
 
 </script>
 
 </body>
-    </html>
+
+</html>
