@@ -197,32 +197,255 @@
 </footer>
 
 
-<script>
+<!-- Firebase -->
 
-function searchStudent() {
+<script type="module">
 
-    const grNo = document.getElementById("grNo").value.trim();
+    import { initializeApp } from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-    const message = document.getElementById("message");
-    const result = document.getElementById("studentResult");
+    import {
+        getDatabase,
+        ref,
+        get,
+        child
+    } from
+    "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    if (grNo === "") {
 
-        message.textContent = "Please enter a GR No.";
+    // Firebase configuration
+    const firebaseConfig = {
+
+        apiKey: "YOUR_API_KEY",
+
+        authDomain:
+            "gbps-karam-khan-nizamani.firebaseapp.com",
+
+        databaseURL:
+            "https://gbps-karam-khan-nizamani-default-rtdb.firebaseio.com",
+
+        projectId:
+            "gbps-karam-khan-nizamani",
+
+        storageBucket:
+            "gbps-karam-khan-nizamani.firebasestorage.app",
+
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+
+        appId: "YOUR_APP_ID"
+
+    };
+
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+
+    const database = getDatabase(app);
+
+
+    // Make function available to HTML button
+    window.searchStudent = async function () {
+
+        const grNo =
+            document.getElementById("grNo").value.trim();
+
+        const message =
+            document.getElementById("message");
+
+        const result =
+            document.getElementById("studentResult");
+
+
+        // Clear previous result
         result.style.display = "none";
 
-        return;
-    }
 
-    /*
-       Firebase student search will be connected here
-       in the next step.
-    */
+        if (grNo === "") {
 
-    message.textContent = "Student search is ready for Firebase connection.";
+            message.textContent =
+                "Please enter a GR No.";
 
-    result.style.display = "none";
-}
+            message.style.color = "red";
+
+            return;
+        }
+
+
+        message.textContent =
+            "Searching...";
+
+        message.style.color =
+            "#0b5d3b";
+
+
+        try {
+
+            const dbRef = ref(database);
+
+            /*
+             * Students are expected to be stored under:
+             *
+             * students
+             *
+             * and each student should have a GR No.
+             */
+
+            const snapshot =
+                await get(child(dbRef, "students"));
+
+
+            if (!snapshot.exists()) {
+
+                message.textContent =
+                    "No student data found.";
+
+                message.style.color =
+                    "red";
+
+                return;
+            }
+
+
+            const students =
+                snapshot.val();
+
+
+            let foundStudent = null;
+
+
+            // Search through students
+            Object.keys(students).forEach(key => {
+
+                const student =
+                    students[key];
+
+
+                if (!student) {
+                    return;
+                }
+
+
+                const studentGR =
+                    String(
+                        student.grNo ??
+                        student.gr ??
+                        student.GRNo ??
+                        ""
+                    ).trim();
+
+
+                if (
+                    studentGR.toLowerCase() ===
+                    grNo.toLowerCase()
+                ) {
+
+                    foundStudent =
+                        student;
+
+                }
+
+            });
+
+
+            if (!foundStudent) {
+
+                message.textContent =
+                    "Student not found.";
+
+                message.style.color =
+                    "red";
+
+                return;
+            }
+
+
+            // Display student information
+
+            document.getElementById("studentGR")
+                .textContent =
+                foundStudent.grNo ??
+                foundStudent.gr ??
+                foundStudent.GRNo ??
+                grNo;
+
+
+            document.getElementById("studentName")
+                .textContent =
+                foundStudent.name ??
+                foundStudent.studentName ??
+                foundStudent.student_name ??
+                "—";
+
+
+            document.getElementById("fatherName")
+                .textContent =
+                foundStudent.fatherName ??
+                foundStudent.father ??
+                foundStudent.father_name ??
+                "—";
+
+
+            document.getElementById("studentClass")
+                .textContent =
+                foundStudent.class ??
+                foundStudent.className ??
+                foundStudent.grade ??
+                "—";
+
+
+            document.getElementById("rollNumber")
+                .textContent =
+                foundStudent.rollNumber ??
+                foundStudent.rollNo ??
+                foundStudent.roll ??
+                "—";
+
+
+            document.getElementById("dateOfBirth")
+                .textContent =
+                foundStudent.dateOfBirth ??
+                foundStudent.dob ??
+                "—";
+
+
+            message.textContent =
+                "Student found successfully.";
+
+            message.style.color =
+                "#0b5d3b";
+
+
+            result.style.display =
+                "block";
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+            message.textContent =
+                "Unable to connect to Firebase.";
+
+            message.style.color =
+                "red";
+
+        }
+
+    };
+
+
+    // Allow pressing Enter to search
+    document.getElementById("grNo")
+        .addEventListener("keypress", function(event) {
+
+            if (event.key === "Enter") {
+
+                window.searchStudent();
+
+            }
+
+        });
 
 </script>
 
