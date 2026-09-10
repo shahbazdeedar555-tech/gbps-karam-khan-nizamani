@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -111,23 +112,39 @@
             cursor: pointer;
         }
 
-        /* SHARE BUTTON */
+        /* SHARE BUTTONS */
+
+        .share-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
 
         .share-btn {
-            width: 100%;
-            margin-top: 15px;
-            background: #1565c0;
-            color: white;
             border: none;
             padding: 13px 18px;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             cursor: pointer;
+            color: white;
+        }
+
+        .share-btn.share {
+            background: #1565c0;
+        }
+
+        .share-btn.copy {
+            background: #6a1b9a;
+        }
+
+        .share-btn.print {
+            background: #455a64;
         }
 
         .share-btn:hover {
-            background: #0d47a1;
+            opacity: 0.9;
         }
 
         .table-container {
@@ -190,6 +207,32 @@
             color: white;
             font-size: 13px;
         }
+
+        @media print {
+
+            header,
+            .back,
+            .filter,
+            .share-buttons,
+            .clear-btn,
+            footer {
+                display: none !important;
+            }
+
+            body {
+                background: white;
+            }
+
+            .box {
+                box-shadow: none;
+                margin-bottom: 10px;
+            }
+
+            .container {
+                max-width: 100%;
+                margin: 0;
+            }
+        }
     </style>
 </head>
 
@@ -206,9 +249,11 @@
         ← Back to Admin Dashboard
     </a>
 
+    <!-- SUMMARY -->
+
     <div class="box">
 
-        <h2>📊 Attendance Summary</h2>
+        <h2>📊 Final Attendance Summary</h2>
 
         <div class="summary">
 
@@ -234,14 +279,34 @@
 
         </div>
 
-        <!-- SHARE BUTTON -->
+        <!-- SHARE BUTTONS -->
 
-        <button class="share-btn" onclick="shareDailyReport()">
-            📤 Share Daily Attendance Report
-        </button>
+        <div class="share-buttons">
+
+            <button
+                class="share-btn share"
+                onclick="shareDailyReport()">
+                📤 Share Report
+            </button>
+
+            <button
+                class="share-btn copy"
+                onclick="copyDailyReport()">
+                📋 Copy Report
+            </button>
+
+            <button
+                class="share-btn print"
+                onclick="printReport()">
+                🖨️ Print Report
+            </button>
+
+        </div>
 
     </div>
 
+
+    <!-- FILTER -->
 
     <div class="box">
 
@@ -279,6 +344,8 @@
         </div>
 
 
+        <!-- TABLE -->
+
         <div class="table-container">
 
             <table>
@@ -308,7 +375,9 @@
         </div>
 
 
-        <button class="clear-btn" onclick="clearReports()">
+        <button
+            class="clear-btn"
+            onclick="clearReports()">
             🗑 Clear Attendance Records
         </button>
 
@@ -324,12 +393,9 @@
 
 <script>
 
-    /*
-       Attendance records are expected to be stored
-       in localStorage under:
-       "attendanceRecords"
-    */
-
+    /* =================================
+       GET ATTENDANCE RECORDS
+       ================================= */
 
     function getAttendanceRecords() {
 
@@ -339,6 +405,10 @@
 
     }
 
+
+    /* =================================
+       LOAD REPORT
+       ================================= */
 
     function loadReport() {
 
@@ -372,6 +442,10 @@
 
     }
 
+
+    /* =================================
+       DISPLAY REPORT
+       ================================= */
 
     function displayReport(records) {
 
@@ -486,11 +560,10 @@
 
 
     /* =================================
-       SHARE DAILY ATTENDANCE REPORT
+       CREATE SHARE TEXT
        ================================= */
 
-
-    async function shareDailyReport() {
+    function createReportText() {
 
         const records =
             getAttendanceRecords();
@@ -558,12 +631,10 @@
             "All Classes";
 
 
-        const shareText =
-
-`🏫 Government Boys Primary School
+        return `🏫 Government Boys Primary School
 Karam Khan Nizamani Campus
 
-📊 Daily Attendance Report
+📊 FINAL DAILY ATTENDANCE REPORT
 
 📅 Date: ${reportDate}
 📚 Class: ${className}
@@ -576,10 +647,21 @@ Karam Khan Nizamani Campus
 
 Government Boys Primary School
 Karam Khan Nizamani Campus
+
 © 2026`;
 
+    }
 
-        /* Native phone sharing */
+
+    /* =================================
+       SHARE REPORT
+       ================================= */
+
+    async function shareDailyReport() {
+
+        const shareText =
+            createReportText();
+
 
         if (navigator.share) {
 
@@ -588,7 +670,7 @@ Karam Khan Nizamani Campus
                 await navigator.share({
 
                     title:
-                        "Daily Attendance Report",
+                        "Final Daily Attendance Report",
 
                     text:
                         shareText
@@ -609,27 +691,7 @@ Karam Khan Nizamani Campus
 
         else {
 
-            /* Clipboard fallback */
-
-            try {
-
-                await navigator.clipboard.writeText(
-                    shareText
-                );
-
-                alert(
-                    "Attendance report copied. You can paste it into WhatsApp or another app."
-                );
-
-            }
-
-            catch (error) {
-
-                alert(
-                    shareText
-                );
-
-            }
+            copyDailyReport();
 
         }
 
@@ -637,9 +699,54 @@ Karam Khan Nizamani Campus
 
 
     /* =================================
-       CLEAR REPORTS
+       COPY REPORT
        ================================= */
 
+    async function copyDailyReport() {
+
+        const shareText =
+            createReportText();
+
+
+        try {
+
+            await navigator.clipboard.writeText(
+                shareText
+            );
+
+
+            alert(
+                "✅ Attendance report copied successfully.\n\nYou can now paste it into WhatsApp."
+            );
+
+        }
+
+        catch (error) {
+
+            alert(
+                "Please copy the report manually:\n\n" +
+                shareText
+            );
+
+        }
+
+    }
+
+
+    /* =================================
+       PRINT REPORT
+       ================================= */
+
+    function printReport() {
+
+        window.print();
+
+    }
+
+
+    /* =================================
+       CLEAR REPORTS
+       ================================= */
 
     function clearReports() {
 
@@ -669,7 +776,7 @@ Karam Khan Nizamani Campus
 
 
     /* =================================
-       LOAD REPORT
+       START
        ================================= */
 
     loadReport();
