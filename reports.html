@@ -111,6 +111,25 @@
             cursor: pointer;
         }
 
+        /* SHARE BUTTON */
+
+        .share-btn {
+            width: 100%;
+            margin-top: 15px;
+            background: #1565c0;
+            color: white;
+            border: none;
+            padding: 13px 18px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .share-btn:hover {
+            background: #0d47a1;
+        }
+
         .table-container {
             overflow-x: auto;
         }
@@ -215,7 +234,14 @@
 
         </div>
 
+        <!-- SHARE BUTTON -->
+
+        <button class="share-btn" onclick="shareDailyReport()">
+            📤 Share Daily Attendance Report
+        </button>
+
     </div>
+
 
     <div class="box">
 
@@ -229,13 +255,21 @@
             >
 
             <select id="classFilter">
+
                 <option value="">All Classes</option>
+
                 <option value="KG">KG</option>
+
                 <option value="Class 1">Class 1</option>
+
                 <option value="Class 2">Class 2</option>
+
                 <option value="Class 3">Class 3</option>
+
                 <option value="Class 4">Class 4</option>
+
                 <option value="Class 5">Class 5</option>
+
             </select>
 
             <button onclick="loadReport()">
@@ -244,11 +278,13 @@
 
         </div>
 
+
         <div class="table-container">
 
             <table>
 
                 <thead>
+
                     <tr>
                         <th>#</th>
                         <th>Student</th>
@@ -256,6 +292,7 @@
                         <th>Date</th>
                         <th>Status</th>
                     </tr>
+
                 </thead>
 
                 <tbody id="reportTable">
@@ -265,9 +302,11 @@
 
         </div>
 
+
         <div id="emptyMessage" class="empty">
             No attendance records found.
         </div>
+
 
         <button class="clear-btn" onclick="clearReports()">
             🗑 Clear Attendance Records
@@ -277,17 +316,20 @@
 
 </div>
 
+
 <footer>
     © 2026 GBPS Karam Khan Nizamani Campus
 </footer>
+
 
 <script>
 
     /*
        Attendance records are expected to be stored
-       in localStorage under the key:
+       in localStorage under:
        "attendanceRecords"
     */
+
 
     function getAttendanceRecords() {
 
@@ -300,7 +342,8 @@
 
     function loadReport() {
 
-        const records = getAttendanceRecords();
+        const records =
+            getAttendanceRecords();
 
         const selectedDate =
             document.getElementById("dateFilter").value;
@@ -308,19 +351,22 @@
         const selectedClass =
             document.getElementById("classFilter").value;
 
-        const filteredRecords = records.filter(function(record) {
 
-            const dateMatch =
-                !selectedDate ||
-                record.date === selectedDate;
+        const filteredRecords =
+            records.filter(function(record) {
 
-            const classMatch =
-                !selectedClass ||
-                record.className === selectedClass;
+                const dateMatch =
+                    !selectedDate ||
+                    record.date === selectedDate;
 
-            return dateMatch && classMatch;
+                const classMatch =
+                    !selectedClass ||
+                    record.className === selectedClass;
 
-        });
+                return dateMatch && classMatch;
+
+            });
+
 
         displayReport(filteredRecords);
 
@@ -335,18 +381,25 @@
         const emptyMessage =
             document.getElementById("emptyMessage");
 
+
         table.innerHTML = "";
 
+
         let present = 0;
+
         let absent = 0;
+
 
         if (records.length === 0) {
 
-            emptyMessage.style.display = "block";
+            emptyMessage.style.display =
+                "block";
 
         } else {
 
-            emptyMessage.style.display = "none";
+            emptyMessage.style.display =
+                "none";
+
 
             records.forEach(function(record, index) {
 
@@ -358,22 +411,39 @@
                     absent++;
                 }
 
+
                 const row =
                     document.createElement("tr");
 
+
                 row.innerHTML = `
+
                     <td>${index + 1}</td>
-                    <td>${record.studentName || "-"}</td>
-                    <td>${record.className || "-"}</td>
-                    <td>${record.date || "-"}</td>
+
+                    <td>
+                        ${record.studentName || "-"}
+                    </td>
+
+                    <td>
+                        ${record.className || "-"}
+                    </td>
+
+                    <td>
+                        ${record.date || "-"}
+                    </td>
+
                     <td class="${
                         record.status === "Present"
                         ? "present"
                         : "absent"
                     }">
+
                         ${record.status || "-"}
+
                     </td>
+
                 `;
+
 
                 table.appendChild(row);
 
@@ -381,46 +451,226 @@
 
         }
 
-        const total = records.length;
+
+        const total =
+            records.length;
+
 
         const percentage =
             total > 0
             ? Math.round((present / total) * 100)
             : 0;
 
-        document.getElementById("totalRecords").textContent =
-            total;
 
-        document.getElementById("presentCount").textContent =
-            present;
+        document.getElementById(
+            "totalRecords"
+        ).textContent = total;
 
-        document.getElementById("absentCount").textContent =
-            absent;
 
-        document.getElementById("attendancePercentage").textContent =
+        document.getElementById(
+            "presentCount"
+        ).textContent = present;
+
+
+        document.getElementById(
+            "absentCount"
+        ).textContent = absent;
+
+
+        document.getElementById(
+            "attendancePercentage"
+        ).textContent =
             percentage + "%";
 
     }
 
 
-    function clearReports() {
+    /* =================================
+       SHARE DAILY ATTENDANCE REPORT
+       ================================= */
 
-        const confirmDelete = confirm(
-            "Are you sure you want to delete ALL attendance records?"
-        );
 
-        if (confirmDelete) {
+    async function shareDailyReport() {
 
-            localStorage.removeItem("attendanceRecords");
+        const records =
+            getAttendanceRecords();
 
-            loadReport();
 
-            alert("All attendance records have been cleared.");
+        const selectedDate =
+            document.getElementById("dateFilter").value;
+
+
+        const selectedClass =
+            document.getElementById("classFilter").value;
+
+
+        const filteredRecords =
+            records.filter(function(record) {
+
+                const dateMatch =
+                    !selectedDate ||
+                    record.date === selectedDate;
+
+                const classMatch =
+                    !selectedClass ||
+                    record.className === selectedClass;
+
+                return dateMatch && classMatch;
+
+            });
+
+
+        let present = 0;
+
+        let absent = 0;
+
+
+        filteredRecords.forEach(function(record) {
+
+            if (record.status === "Present") {
+                present++;
+            }
+
+            if (record.status === "Absent") {
+                absent++;
+            }
+
+        });
+
+
+        const total =
+            filteredRecords.length;
+
+
+        const percentage =
+            total > 0
+            ? Math.round((present / total) * 100)
+            : 0;
+
+
+        const reportDate =
+            selectedDate ||
+            new Date().toISOString().split("T")[0];
+
+
+        const className =
+            selectedClass ||
+            "All Classes";
+
+
+        const shareText =
+
+`🏫 Government Boys Primary School
+Karam Khan Nizamani Campus
+
+📊 Daily Attendance Report
+
+📅 Date: ${reportDate}
+📚 Class: ${className}
+
+👥 Total Records: ${total}
+🟢 Present: ${present}
+🔴 Absent: ${absent}
+
+📈 Attendance Rate: ${percentage}%
+
+Government Boys Primary School
+Karam Khan Nizamani Campus
+© 2026`;
+
+
+        /* Native phone sharing */
+
+        if (navigator.share) {
+
+            try {
+
+                await navigator.share({
+
+                    title:
+                        "Daily Attendance Report",
+
+                    text:
+                        shareText
+
+                });
+
+            }
+
+            catch (error) {
+
+                console.log(
+                    "Share cancelled."
+                );
+
+            }
+
+        }
+
+        else {
+
+            /* Clipboard fallback */
+
+            try {
+
+                await navigator.clipboard.writeText(
+                    shareText
+                );
+
+                alert(
+                    "Attendance report copied. You can paste it into WhatsApp or another app."
+                );
+
+            }
+
+            catch (error) {
+
+                alert(
+                    shareText
+                );
+
+            }
 
         }
 
     }
 
+
+    /* =================================
+       CLEAR REPORTS
+       ================================= */
+
+
+    function clearReports() {
+
+        const confirmDelete =
+            confirm(
+                "Are you sure you want to delete ALL attendance records?"
+            );
+
+
+        if (confirmDelete) {
+
+            localStorage.removeItem(
+                "attendanceRecords"
+            );
+
+
+            loadReport();
+
+
+            alert(
+                "All attendance records have been cleared."
+            );
+
+        }
+
+    }
+
+
+    /* =================================
+       LOAD REPORT
+       ================================= */
 
     loadReport();
 
