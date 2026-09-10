@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -255,8 +254,6 @@
         ← Back to Admin Dashboard
     </a>
 
-    <!-- SUMMARY -->
-
     <div class="box">
 
         <h2>📊 Final Daily Attendance Summary</h2>
@@ -290,8 +287,6 @@
 
         </div>
 
-        <!-- BUTTONS -->
-
         <div class="buttons">
 
             <button class="btn refresh" onclick="loadReport()">
@@ -313,9 +308,6 @@
         </div>
 
     </div>
-
-
-    <!-- FILTER -->
 
     <div class="box">
 
@@ -352,9 +344,6 @@
 
         </div>
 
-
-        <!-- TABLE -->
-
         <div class="table-container">
 
             <table>
@@ -386,7 +375,6 @@
 
 </div>
 
-
 <footer>
     <strong>Government Boys Primary School</strong><br>
     Karam Khan Nizamani Campus<br>
@@ -396,376 +384,372 @@
 
 <script>
 
-    /* ==========================================
-       GET ATTENDANCE RECORDS
-       ========================================== */
+/* ==========================================
+   GET ATTENDANCE RECORDS
+   ========================================== */
 
-    function getAttendanceRecords() {
+function getAttendanceRecords() {
 
-        return JSON.parse(
-            localStorage.getItem("attendanceRecords")
-        ) || [];
+    return JSON.parse(
+        localStorage.getItem("attendanceRecords")
+    ) || [];
 
-    }
-
-
-    /* ==========================================
-       TODAY'S DATE
-       ========================================== */
-
-    function getToday() {
-
-        const today = new Date();
-
-        const year = today.getFullYear();
-
-        const month =
-            String(today.getMonth() + 1).padStart(2, "0");
-
-        const day =
-            String(today.getDate()).padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
-
-    }
+}
 
 
-    /* ==========================================
-       LOAD REPORT
-       ========================================== */
+/* ==========================================
+   TODAY'S DATE
+   ========================================== */
 
-    function loadReport() {
+function getToday() {
 
-        const records =
-            getAttendanceRecords();
+    const today = new Date();
 
-        const selectedDate =
-            document.getElementById("dateFilter").value;
+    const year = today.getFullYear();
 
-        const selectedClass =
-            document.getElementById("classFilter").value;
+    const month =
+        String(today.getMonth() + 1).padStart(2, "0");
 
+    const day =
+        String(today.getDate()).padStart(2, "0");
 
-        const filteredRecords =
-            records.filter(function(record) {
+    return `${year}-${month}-${day}`;
 
-                const dateMatch =
-                    !selectedDate ||
-                    record.date === selectedDate;
-
-                const classMatch =
-                    !selectedClass ||
-                    record.className === selectedClass;
-
-                return dateMatch && classMatch;
-
-            });
+}
 
 
-        displayReport(filteredRecords);
+/* ==========================================
+   GET FILTERED RECORDS
+   ========================================== */
 
-    }
+function getFilteredRecords() {
+
+    const records =
+        getAttendanceRecords();
+
+    const selectedDate =
+        document.getElementById("dateFilter").value;
+
+    const selectedClass =
+        document.getElementById("classFilter").value;
+
+    return records.filter(function(record) {
+
+        const dateMatch =
+            !selectedDate ||
+            record.date === selectedDate;
+
+        const classMatch =
+            !selectedClass ||
+            record.className === selectedClass;
+
+        return dateMatch && classMatch;
+
+    });
+
+}
 
 
-    /* ==========================================
-       DISPLAY REPORT
-       ========================================== */
+/* ==========================================
+   LOAD REPORT
+   ========================================== */
 
-    function displayReport(records) {
+function loadReport() {
 
-        const table =
-            document.getElementById("reportTable");
+    const filteredRecords =
+        getFilteredRecords();
 
-        const emptyMessage =
-            document.getElementById("emptyMessage");
+    displayReport(filteredRecords);
 
-
-        table.innerHTML = "";
+}
 
 
-        let present = 0;
+/* ==========================================
+   DISPLAY REPORT
+   ========================================== */
 
-        let absent = 0;
+function displayReport(records) {
 
-        let leave = 0;
+    const table =
+        document.getElementById("reportTable");
+
+    const emptyMessage =
+        document.getElementById("emptyMessage");
+
+    table.innerHTML = "";
+
+    let present = 0;
+    let absent = 0;
+    let leave = 0;
 
 
-        records.forEach(function(record) {
+    records.forEach(function(record) {
+
+        if (record.status === "Present") {
+            present++;
+        }
+
+        if (record.status === "Absent") {
+            absent++;
+        }
+
+        if (
+            record.status === "Leave" ||
+            record.status === "On Leave"
+        ) {
+            leave++;
+        }
+
+    });
+
+
+    if (records.length === 0) {
+
+        emptyMessage.style.display = "block";
+
+    } else {
+
+        emptyMessage.style.display = "none";
+
+
+        records.forEach(function(record, index) {
+
+            let statusClass = "";
 
             if (record.status === "Present") {
-                present++;
+                statusClass = "present";
             }
 
-            if (record.status === "Absent") {
-                absent++;
+            else if (record.status === "Absent") {
+                statusClass = "absent";
             }
 
-            if (
+            else if (
                 record.status === "Leave" ||
                 record.status === "On Leave"
             ) {
-                leave++;
+                statusClass = "leave";
             }
+
+
+            const row =
+                document.createElement("tr");
+
+
+            row.innerHTML = `
+
+                <td>${index + 1}</td>
+
+                <td>
+                    ${record.studentName || "-"}
+                </td>
+
+                <td>
+                    ${record.className || "-"}
+                </td>
+
+                <td>
+                    ${record.date || "-"}
+                </td>
+
+                <td class="${statusClass}">
+                    ${record.status || "-"}
+                </td>
+
+            `;
+
+
+            table.appendChild(row);
 
         });
 
-
-        if (records.length === 0) {
-
-            emptyMessage.style.display = "block";
-
-        } else {
-
-            emptyMessage.style.display = "none";
-
-
-            records.forEach(function(record, index) {
-
-                let statusClass = "";
-
-                if (record.status === "Present") {
-                    statusClass = "present";
-                }
-
-                else if (record.status === "Absent") {
-                    statusClass = "absent";
-                }
-
-                else if (
-                    record.status === "Leave" ||
-                    record.status === "On Leave"
-                ) {
-                    statusClass = "leave";
-                }
-
-
-                const row =
-                    document.createElement("tr");
-
-
-                row.innerHTML = `
-
-                    <td>${index + 1}</td>
-
-                    <td>
-                        ${record.studentName || "-"}
-                    </td>
-
-                    <td>
-                        ${record.className || "-"}
-                    </td>
-
-                    <td>
-                        ${record.date || "-"}
-                    </td>
-
-                    <td class="${statusClass}">
-                        ${record.status || "-"}
-                    </td>
-
-                `;
-
-
-                table.appendChild(row);
-
-            });
-
-        }
-
-
-        document.getElementById(
-            "totalRecords"
-        ).textContent = records.length;
-
-
-        document.getElementById(
-            "presentCount"
-        ).textContent = present;
-
-
-        document.getElementById(
-            "absentCount"
-        ).textContent = absent;
-
-
-        document.getElementById(
-            "leaveCount"
-        ).textContent = leave;
-
-
-        document.getElementById(
-            "reportDate"
-        ).textContent =
-            document.getElementById("dateFilter").value ||
-            getToday();
-
     }
 
 
-    /* ==========================================
-       CREATE REPORT TEXT
-       ========================================== */
-
-    function createReportText() {
-
-        const records =
-            getAttendanceRecords();
+    document.getElementById(
+        "totalRecords"
+    ).textContent = records.length;
 
 
-        const selectedDate =
-            document.getElementById("dateFilter").value;
+    document.getElementById(
+        "presentCount"
+    ).textContent = present;
 
 
-        const selectedClass =
-            document.getElementById("classFilter").value;
+    document.getElementById(
+        "absentCount"
+    ).textContent = absent;
 
 
-        const filteredRecords =
-            records.filter(function(record) {
-
-                const dateMatch =
-                    !selectedDate ||
-                    record.date === selectedDate;
-
-                const classMatch =
-                    !selectedClass ||
-                    record.className === selectedClass;
-
-                return dateMatch && classMatch;
-
-            });
+    document.getElementById(
+        "leaveCount"
+    ).textContent = leave;
 
 
-        let present = 0;
+    document.getElementById(
+        "reportDate"
+    ).textContent =
+        document.getElementById("dateFilter").value ||
+        getToday();
 
-        let absent = 0;
-
-        let leave = 0;
+}
 
 
-        filteredRecords.forEach(function(record) {
+/* ==========================================
+   CREATE COMPLETE REPORT TEXT
+   ========================================== */
 
-            if (record.status === "Present") {
-                present++;
-            }
+function createReportText() {
 
-            if (record.status === "Absent") {
-                absent++;
-            }
+    const records =
+        getFilteredRecords();
 
-            if (
-                record.status === "Leave" ||
-                record.status === "On Leave"
-            ) {
-                leave++;
-            }
+
+    let present = 0;
+    let absent = 0;
+    let leave = 0;
+
+
+    records.forEach(function(record) {
+
+        if (record.status === "Present") {
+            present++;
+        }
+
+        if (record.status === "Absent") {
+            absent++;
+        }
+
+        if (
+            record.status === "Leave" ||
+            record.status === "On Leave"
+        ) {
+            leave++;
+        }
+
+    });
+
+
+    const total =
+        records.length;
+
+
+    const reportDate =
+        document.getElementById("dateFilter").value ||
+        getToday();
+
+
+    const selectedClass =
+        document.getElementById("classFilter").value;
+
+
+    const className =
+        selectedClass || "ALL CLASSES";
+
+
+    let text = "";
+
+    text += "🏫 GOVERNMENT BOYS PRIMARY SCHOOL\n";
+    text += "KARAM KHAN NIZAMANI CAMPUS\n\n";
+
+    text += "📊 FINAL DAILY ATTENDANCE REPORT\n\n";
+
+    text += "📅 Date: " + reportDate + "\n";
+    text += "📚 Class: " + className + "\n\n";
+
+    text += "👥 Total Students: " + total + "\n";
+    text += "🟢 Present: " + present + "\n";
+    text += "🔴 Absent: " + absent + "\n";
+    text += "🟡 Leave: " + leave + "\n\n";
+
+    text += "━━━━━━━━━━━━━━━━━━━━\n";
+    text += "👨‍🎓 STUDENT ATTENDANCE\n";
+    text += "━━━━━━━━━━━━━━━━━━━━\n\n";
+
+
+    if (records.length === 0) {
+
+        text += "No attendance records found.\n";
+
+    } else {
+
+        records.forEach(function(record, index) {
+
+            text +=
+                (index + 1) +
+                ". " +
+                (record.studentName || "-") +
+                " | " +
+                (record.className || "-") +
+                " | " +
+                (record.status || "-") +
+                "\n";
 
         });
 
-
-        const total =
-            filteredRecords.length;
-
-
-        const reportDate =
-            selectedDate || getToday();
-
-
-        const className =
-            selectedClass || "ALL CLASSES";
-
-
-        return `🏫 Government Boys Primary School
-Karam Khan Nizamani Campus
-
-📊 FINAL DAILY ATTENDANCE REPORT
-
-📅 Date: ${reportDate}
-📚 Class: ${className}
-
-👥 Total Students: ${total}
-🟢 Present: ${present}
-🔴 Absent: ${absent}
-🟡 Leave: ${leave}
-
-Government Boys Primary School
-Karam Khan Nizamani Campus
-
-© 2026`;
-
     }
 
 
-    /* ==========================================
-       SHARE
-       ========================================== */
+    text += "\n━━━━━━━━━━━━━━━━━━━━\n";
 
-    async function shareDailyReport() {
+    text +=
+        "Government Boys Primary School\n" +
+        "Karam Khan Nizamani Campus\n\n";
 
-        const text =
-            createReportText();
-
-
-        if (navigator.share) {
-
-            try {
-
-                await navigator.share({
-
-                    title:
-                        "Final Daily Attendance Report",
-
-                    text:
-                        text
-
-                });
-
-            }
-
-            catch (error) {
-
-                console.log(
-                    "Share cancelled."
-                );
-
-            }
-
-        }
-
-        else {
-
-            copyDailyReport();
-
-        }
-
-    }
+    text += "© 2026";
 
 
-    /* ==========================================
-       COPY
-       ========================================== */
+    return text;
 
-    async function copyDailyReport() {
+}
 
-        const text =
-            createReportText();
 
+/* ==========================================
+   SHARE COMPLETE REPORT
+   ========================================== */
+
+async function shareDailyReport() {
+
+    const text =
+        createReportText();
+
+
+    if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({
+            text: text
+        })
+    ) {
 
         try {
 
-            await navigator.clipboard.writeText(text);
+            await navigator.share({
 
-            alert(
-                "✅ Report copied successfully.\n\nYou can now paste it into WhatsApp."
-            );
+                title:
+                    "Final Daily Attendance Report",
+
+                text:
+                    text
+
+            });
+
+            return;
 
         }
 
         catch (error) {
 
-            alert(
-                "Please copy the report manually:\n\n" +
-                text
+            if (
+                error &&
+                error.name === "AbortError"
+            ) {
+                return;
+            }
+
+            console.log(
+                "Native sharing failed.",
+                error
             );
 
         }
@@ -773,27 +757,63 @@ Karam Khan Nizamani Campus
     }
 
 
-    /* ==========================================
-       PRINT
-       ========================================== */
+    copyDailyReport();
 
-    function printReport() {
+}
 
-        window.print();
+
+/* ==========================================
+   COPY COMPLETE REPORT
+   ========================================== */
+
+async function copyDailyReport() {
+
+    const text =
+        createReportText();
+
+
+    try {
+
+        await navigator.clipboard.writeText(text);
+
+        alert(
+            "✅ Complete attendance report copied successfully.\n\nYou can now paste it into WhatsApp."
+        );
 
     }
 
+    catch (error) {
 
-    /* ==========================================
-       START PAGE
-       ========================================== */
+        alert(
+            "Please copy the report manually:\n\n" +
+            text
+        );
 
-    document.getElementById(
-        "dateFilter"
-    ).value = getToday();
+    }
+
+}
 
 
-    loadReport();
+/* ==========================================
+   PRINT
+   ========================================== */
+
+function printReport() {
+
+    window.print();
+
+}
+
+
+/* ==========================================
+   START PAGE
+   ========================================== */
+
+document.getElementById(
+    "dateFilter"
+).value = getToday();
+
+loadReport();
 
 </script>
 
